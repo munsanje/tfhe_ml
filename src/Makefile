@@ -13,6 +13,9 @@ test.o: test.cpp encryption.hpp arithmetic.o
 arithmetic.o: arithmetic.cpp arithmetic.hpp
 	$(CC) $(CCFLAGS) -c arithmetic.cpp $(LDFLAGS)
 
+encryption.o: encryption.hpp
+	$(CC) $(CCFLAGS) -o encryption.o -c encryption.hpp $(LDFLAGS)
+
 clean:
 	rm -f test
 	rm -f *.o *.gch

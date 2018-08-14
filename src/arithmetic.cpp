@@ -15,14 +15,14 @@ module full_adder(a, b, cin, cout, s);
    cout = (cin & temp) | (a & b);
 endmodule
 */
-void add(LweSample* sum, LweSample* a, LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  LweSample *carry = new_gate_bootstrapping_ciphertext_array(1, bk->params),
-            *tmp = new_gate_bootstrapping_ciphertext_array(1, bk->params);
+void add(LweSample* sum, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+  LweSample *carry = new_gate_bootstrapping_ciphertext(bk->params),
+            *tmp = new_gate_bootstrapping_ciphertext(bk->params);
 
-  bootsCONSTANT(carry, 0, bk);  // zero-initialize carry
-
-  //
-  for(int i = 0; i < size - 1; i++) {
+  // first iteration
+  bootsXOR(&sum[0], &a[0], &b[0], bk);
+  bootsAND(carry, &a[0], &b[0], bk);
+  for(int i = 1; i < size; i++) {
     bootsXOR(tmp, &a[i], &b[i], bk);
     bootsXOR(&sum[i], tmp, carry, bk);
     bootsAND(carry, carry, tmp, bk);
@@ -31,10 +31,14 @@ void add(LweSample* sum, LweSample* a, LweSample* b, const TFheGateBootstrapping
   }
 }
 
-// NOTE ASSUMING LSB at 0th entry
-void leftRotate(LweSample* result, LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  leftShift(result, a, bk, size);
-  bootsOR(&result[0], &result[0], &a[size-1], bk);
+/**
+Python code: lr = lambda x, n, amnt: ((x << amnt) | (x >> (n-amnt)))&(2**n-1)
+*/
+void leftRotate(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size, int amnt) {
+  leftShift(result, a, bk, size, amnt);
+  for(int i = 0; i < amnt; i++) {
+    bootsCOPY(&result[i], &a[size-amnt+i], bk);
+  }
 }
 
 /*
@@ -42,49 +46,63 @@ Numbers are assumed to be encoded in little-endian. I.e, with the LSB at the low
 element 0 is the LSB. A left shift then corresponds to moving i to i+1, etc.
 Note the left most bit is set to 0
 */
-void leftShift(LweSample* result, LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  bootsCONSTANT(result, 0, bk);
-  for(int i = 0; i < size-1; i++) {
-    bootsOR(&result[i+1], &a[i], &a[i], bk);
+void leftShift(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size, int amnt) {
+  zero(&result[0], bk, size);
+  for(int i = 0; i < size-amnt; i++) {
+    bootsCOPY(&result[i+amnt], &a[i], bk);
   }
 }
 
-void rightRotate(LweSample* result, LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  rightShift(result, a, bk, size);
-  bootsOR(&result[size-1], &result[size-1], &a[0], bk);
+/**
+Python code: rr = lambda x, n, amnt: ((x >> amnt) | (x << (n-amnt)))&(2**n-1)
+*/
+void rightRotate(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size, int amnt) {
+  rightShift(result, a, bk, size, amnt);
+  for(int i = 0; i < amnt; i++) {
+    bootsCOPY(&result[size-amnt+i], &a[i], bk);
+  }
 }
 
-void rightShift(LweSample* result, LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  bootsCONSTANT(result, 0, bk);
-  for(int i = size - 1; i > 1; i--) {
-    bootsOR(&result[i-1], &a[i], &a[i], bk);
+void rightShift(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size, int amnt) {
+  zero(result, bk, size);
+  for(int i = size-1; i > (amnt-1); i--) {
+    bootsCOPY(&result[i-amnt], &a[i], bk);
   }
 }
 
 
-void sub(LweSample* result, LweSample* a, LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+void sub(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
   LweSample *c = new_gate_bootstrapping_ciphertext_array(size, bk->params);
-  copy(c, b, bk);
-  twosComplement(c, bk, size);
+  twosComplement(c, b, bk, size);
   add(result, a, c, bk, size);
 }
 
 
-void mult(int64_t* a, int64_t* b) {
+void mult(LweSample* result, LweSample* a, LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
 
 }
 
 /* Implements two's complement*/
-void twosComplement(LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  LweSample *one = new_gate_bootstrapping_ciphertext_array(size, bk->params);
-  bootsCONSTANT(one, 1, bk);
+void twosComplement(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+  LweSample *one = new_gate_bootstrapping_ciphertext_array(size, bk->params),
+            *c = new_gate_bootstrapping_ciphertext_array(size, bk->params);;
+  zero(one, bk, size);
+  bootsCONSTANT(&one[0], 1, bk);
+  copy(c, a, bk, size);
+
   for(int i = 0; i < size; i++) {
-    bootsNOT(&a[i], &a[i], bk);
+    bootsNOT(&c[i], &c[i], bk);
   }
-  add(a, a, one, bk, size);
+  add(result, c, one, bk, size);
 }
 
-void copy(LweSample* dest, const LweSample* source, const TFheGateBootstrappingCloudKeySet* bk) {
-  bootsCONSTANT(dest, 0, bk);
-  bootsOR(dest, dest, source, bk);
+void copy(LweSample* dest, const LweSample* source, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+  for(int i = 0; i < size; i++) {
+    bootsCOPY(&dest[i], &source[i], bk);
+  }
+}
+
+void zero(LweSample* result, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+  for(int i = 0; i < size; i++)
+    bootsCONSTANT(&result[i], 0, bk);
 }
