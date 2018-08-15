@@ -1,5 +1,4 @@
 #include "arithmetic.hpp"
-#include <cstdio>
 /*
 Implements bitwise full-adder circuit on two 64-bit integers
 TODO: sort out size type convention, perhaps make flexible
@@ -23,8 +22,10 @@ void add(LweSample* sum, const LweSample* a, const LweSample* b, const TFheGateB
   bootsXOR(&sum[0], &a[0], &b[0], bk);
   bootsAND(carry, &a[0], &b[0], bk);
   for(int i = 1; i < size; i++) {
+    // sum
     bootsXOR(tmp, &a[i], &b[i], bk);
     bootsXOR(&sum[i], tmp, carry, bk);
+    // carry
     bootsAND(carry, carry, tmp, bk);
     bootsAND(tmp, &a[i], &b[i], bk);
     bootsOR(carry, carry, tmp, bk);
@@ -90,7 +91,9 @@ Implements simple shift and add algorithm:
 Let A and B be the operands, s.t P = AxB
 Then P = Axb_0 << 0 + Axb_1 << 1 + ... + Axb_{n-1} << {n-1}
 
-FIXME implement BW algorithm
+TODO
+1. implement BW algorithm
+2. Vectorize
 Reference:
 Baugh-Wooley Multiplication Algorithm.
 http://www.ece.uvic.ca/~fayez/courses/ceng465/lab_465/project2/multiplier.pdf
