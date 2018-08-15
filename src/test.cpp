@@ -1,9 +1,16 @@
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include "encryption.hpp"
-#include "arithmetic.hpp"
+#include "alu.hpp"
 
 using namespace std;
+
+typedef std::chrono::steady_clock::time_point chrono_time;
+
+chrono_time get_time() {
+  return std::chrono::steady_clock::now();
+}
 
 int main() {
   // initialize encryption variables
@@ -31,10 +38,15 @@ int main() {
   LweSample *sum = new_gate_bootstrapping_ciphertext_array(size, params);
   // sub(sum, enc, b, ck, 16);
   // twosComplement(sum, enc, ck, size);
-  // add(sum, enc, one, ck, 16);
   // rightRotate(sum, enc, ck, size, 3);
   // leftRotate(sum, enc, ck, size, 16);
-  mult(sum, enc, b, ck, size);
+  chrono_time start = get_time();
+  // add(sum, enc, b, ck, size);
+  // zero(enc, ck, size);
+  // mult(sum, enc, b, ck, size);
+  copy(sum, enc, ck, size);
+  chrono_time end = get_time();
+  cout << std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() << " microseconds" << endl;
 
 
   num_type recovered = decrypt<num_type>(enc, sk);

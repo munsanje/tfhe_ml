@@ -1,4 +1,4 @@
-#include "arithmetic.hpp"
+#include "alu.hpp"
 /*
 Implements bitwise full-adder circuit on two 64-bit integers
 TODO: sort out size type convention, perhaps make flexible
@@ -149,6 +149,7 @@ void copy(LweSample* dest, const LweSample* source, const TFheGateBootstrappingC
 }
 
 void zero(LweSample* result, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
-  for(int i = 0; i < size; i++)
+  for(int i = 0; i < size; i++) {
     bootsCONSTANT(&result[i], 0, bk);
+  }
 }
