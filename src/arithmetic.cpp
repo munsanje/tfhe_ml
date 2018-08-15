@@ -29,6 +29,10 @@ void add(LweSample* sum, const LweSample* a, const LweSample* b, const TFheGateB
     bootsAND(tmp, &a[i], &b[i], bk);
     bootsOR(carry, carry, tmp, bk);
   }
+
+  // clean up
+  delete_gate_bootstrapping_ciphertext(carry);
+  delete_gate_bootstrapping_ciphertext(tmp);
 }
 
 /**
@@ -75,11 +79,46 @@ void sub(LweSample* result, const LweSample* a, const LweSample* b, const TFheGa
   LweSample *c = new_gate_bootstrapping_ciphertext_array(size, bk->params);
   twosComplement(c, b, bk, size);
   add(result, a, c, bk, size);
+
+  // clean up
+  delete_gate_bootstrapping_ciphertext_array(size, c);
 }
 
 
-void mult(LweSample* result, LweSample* a, LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+/**
+Implements simple shift and add algorithm:
+Let A and B be the operands, s.t P = AxB
+Then P = Axb_0 << 0 + Axb_1 << 1 + ... + Axb_{n-1} << {n-1}
 
+FIXME implement BW algorithm
+Reference:
+Baugh-Wooley Multiplication Algorithm.
+http://www.ece.uvic.ca/~fayez/courses/ceng465/lab_465/project2/multiplier.pdf
+*/
+void mult(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {
+  // to store the intermediate results of final result. Note intermediate result has 2n bits
+  // p = p_0 * 2^0 + .. + p_{n-1} * 2^{n-1}
+  int int_size = 2*size;
+  LweSample *p = new_gate_bootstrapping_ciphertext_array(int_size, bk->params);
+  // accumulator
+  LweSample *acc = new_gate_bootstrapping_ciphertext_array(int_size, bk->params);
+  LweSample *acc_cpy = new_gate_bootstrapping_ciphertext_array(int_size, bk->params);
+  zero(acc, bk, int_size);
+  for(int i = 0; i < size; i++) {
+    zero(p, bk, int_size);
+    for(int j = 0; j < size; j++) {
+      bootsAND(&p[i+j], &a[j], &b[i], bk);
+    }
+    copy(acc_cpy, acc, bk, int_size);
+    add(acc, acc_cpy, p, bk, int_size);
+  }
+  // copy only lower n bits (precision loss)
+  copy(result, acc, bk, size);
+
+  // clean up
+  delete_gate_bootstrapping_ciphertext_array(int_size, p);
+  delete_gate_bootstrapping_ciphertext_array(int_size, acc);
+  delete_gate_bootstrapping_ciphertext_array(int_size, acc_cpy);
 }
 
 /* Implements two's complement*/
@@ -94,6 +133,10 @@ void twosComplement(LweSample* result, const LweSample* a, const TFheGateBootstr
     bootsNOT(&c[i], &c[i], bk);
   }
   add(result, c, one, bk, size);
+
+  // clean up
+  delete_gate_bootstrapping_ciphertext_array(size, one);
+  delete_gate_bootstrapping_ciphertext_array(size, c);
 }
 
 void copy(LweSample* dest, const LweSample* source, const TFheGateBootstrappingCloudKeySet* bk, size_t size) {

@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include "encryption.hpp"
 #include "arithmetic.hpp"
@@ -12,19 +13,19 @@ int main() {
   const TFheGateBootstrappingCloudKeySet* ck = &sk->cloud;
 
   // initialize test parameters
-  typedef uint16_t num_type;
+  typedef uint8_t num_type;
   size_t size = sizeof(num_type) * 8;
-  num_type pt = 3;
+  num_type pt = 4;
 
-  cout << "Plaintext:\n" << pt << endl;
-  cout << "sizeof " << size << endl;
+  printf("%d\n", pt);
+  printf("sizeof %d\n", size);
 
   // encryption variable
   LweSample *enc = new_gate_bootstrapping_ciphertext_array(size, params);
   encrypt<num_type>(enc, &pt, sk);
   // encryption variable 2
   LweSample *b = new_gate_bootstrapping_ciphertext_array(size, params);
-  num_type pt2 = 2;
+  num_type pt2 = 20;
   encrypt<num_type>(b, &pt2, sk);
 
   LweSample *sum = new_gate_bootstrapping_ciphertext_array(size, params);
@@ -32,15 +33,16 @@ int main() {
   // twosComplement(sum, enc, ck, size);
   // add(sum, enc, one, ck, 16);
   // rightRotate(sum, enc, ck, size, 3);
-  leftRotate(sum, enc, ck, size, 1);
+  // leftRotate(sum, enc, ck, size, 16);
+  mult(sum, enc, b, ck, size);
 
 
   num_type recovered = decrypt<num_type>(enc, sk);
-  cout << "recovered: " << recovered << endl;
+  printf("recovered: %d\n", recovered);
 
 
   num_type recovered_sum = decrypt<num_type>(sum, sk);
-  cout << "recovered_sum: " << recovered_sum << endl;
+  printf("recovered_sum: %d\n", recovered_sum);
 
 
 }
