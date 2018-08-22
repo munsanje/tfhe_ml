@@ -8,6 +8,7 @@ Implements higher level encryption functions to make using tfhe easier
 #include <tfhe/tfhe.h>
 #include <tfhe/tfhe_io.h>
 
+
 /*Encrypt plaintext sample given secret key*/
 template<typename T>
 void encrypt(LweSample* cipher, T* plaintext, const TFheGateBootstrappingSecretKeySet* sk) {
