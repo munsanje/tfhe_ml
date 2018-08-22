@@ -38,5 +38,3 @@ void MUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSam
 void reduce_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 
 void seq_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
-
-int reduce_sum(int* arrays, int n);

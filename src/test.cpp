@@ -45,15 +45,15 @@ int main() {
   // leftRotate(sum, enc, ck, size, 16);
   // zero(enc, ck, size);
   // mult(sum, enc, b, ck, size);
-  int times = 5;
+  int times = 3;
   double stt = omp_get_wtime();
   for(int i = 0; i < times; i++)
-    reduce_add(sum, arrays, array_size, ck, size);
+    // reduce_add(sum, arrays, array_size, ck, size);
     // seq_add(sum, arrays, array_size, ck, size);
     // invert(sum, enc, ck, size);
     // bootsOR(sum, enc, b, ck);
     // OR(sum, enc, b, ck, size);
-    // mult(sum, enc, b, ck, size);
+    mult(sum, enc, b, ck, size);
     // add(sum, enc, b, ck, size);
     // add(sum, enc, b, ck, size);
     // copy(sum, enc, ck, size);

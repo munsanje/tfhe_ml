@@ -47,29 +47,6 @@ void add(LweSample* sum, const LweSample* a, const LweSample* b, const TFheGateB
   delete_gate_bootstrapping_ciphertext(tmp_c);
 }
 
-/**
-Parallel reduce sum implementation. Gives ~1.6x speedup over sequential
-
-*/
-
-int reduce_sum(int* arrays, int n) {
-  if(n == 1)
-    return arrays[0];
-  else if(n == 2)
-    return arrays[0] + arrays[1];
-
-  int mid_point = n/2;
-  int a, b;
-  #pragma omp parallel sections num_threads(2)
-  {
-    #pragma omp section
-    a = reduce_sum(arrays, mid_point);
-    #pragma omp section
-    b = reduce_sum(&arrays[mid_point], n-mid_point);
-
-  }
-  return a + b;
-}
 
 /**
   Sequential array sum implementation. Included for completeness and testing
@@ -82,6 +59,11 @@ void seq_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGa
 }
 
 
+/**
+Parallel reduce sum implementation. Gives ~1.6x speedup over sequential
+TODO: use std::vector
+
+*/
 void reduce_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
 
   if(num_arrays == 1) {
@@ -102,6 +84,7 @@ void reduce_add(LweSample* result, LweSample** arrays, int num_arrays, const TFh
     reduce_add(result1, &arrays[mid_point], num_arrays-mid_point, ck, size);
   }
   add(result, result, result1, ck, size);
+  delete_gate_bootstrapping_ciphertext_array(size, result1);
 }
 
 /**
@@ -165,38 +148,34 @@ void sub(LweSample* result, const LweSample* a, const LweSample* b, const TFheGa
 Implements simple shift and add algorithm:
 Let A and B be the operands, s.t P = AxB
 Then P = Axb_0 << 0 + Axb_1 << 1 + ... + Axb_{n-1} << {n-1}
+1. Multiply each bit of A by each bit of B, to get n n-bit arrays.
+  - Note that for full precision, we would need n 2n-bit arrays. But we are dealing with fixed precision.
+2. Reduce sum each of the n arrays
 
-TODO
-1. implement BW algorithm
-2. Vectorize
-Reference:
-Baugh-Wooley Multiplication Algorithm.
-http://www.ece.uvic.ca/~fayez/courses/ceng465/lab_465/project2/multiplier.pdf
+Space complexity is O(n^2)
+
 */
 void mult(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
   // to store the intermediate results of final result. Note intermediate result has 2n bits
   // p = p_0 * 2^0 + .. + p_{n-1} * 2^{n-1}
-  int int_size = 2*size;
-  LweSample *p = new_gate_bootstrapping_ciphertext_array(int_size, ck->params);
-  // accumulator
-  LweSample *acc = new_gate_bootstrapping_ciphertext_array(int_size, ck->params);
-  LweSample *acc_cpy = new_gate_bootstrapping_ciphertext_array(int_size, ck->params);
-  zero(acc, ck, int_size);
+  // Create n n-bit arrays
+  LweSample **p = new LweSample*[size];
   for(int i = 0; i < size; i++) {
-    zero(p, ck, int_size);
-    for(int j = 0; j < size; j++) {
-      bootsAND(&p[i+j], &a[j], &b[i], ck);
-    }
-    copy(acc_cpy, acc, ck, int_size);
-    add(acc, acc_cpy, p, ck, int_size);
+    p[i] = new_gate_bootstrapping_ciphertext_array(size, ck->params);
+    zero(p[i], ck, size);
   }
-  // copy only lower n bits (precision loss)
-  copy(result, acc, ck, size);
+  #pragma omp parallel for num_threads(NUM_THREADS)
+  for(int i = 0; i < size; i++) {
+    for(int j = 0; j < size-i; j++) {
+      bootsAND(&p[i][i+j], &a[j], &b[i], ck);
+    }
+  }
+  reduce_add(result, p, size, ck, size);
 
   // clean up
-  delete_gate_bootstrapping_ciphertext_array(int_size, p);
-  delete_gate_bootstrapping_ciphertext_array(int_size, acc);
-  delete_gate_bootstrapping_ciphertext_array(int_size, acc_cpy);
+  for(int i = 0; i < size; i++)
+    delete_gate_bootstrapping_ciphertext_array(size, p[i]);
+  delete[] p;
 }
 
 /* Implements two's complement*/
