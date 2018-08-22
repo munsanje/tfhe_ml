@@ -1,4 +1,3 @@
-#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include "encryption.hpp"
@@ -7,15 +6,10 @@
 #include <omp.h>
 using namespace std;
 
-typedef std::chrono::high_resolution_clock::time_point chrono_time;
-// typedef std::chrono::steady_clock::time_point chrono_time;
-
-chrono_time get_time() {
-  // return std::chrono::steady_clock::now();
-  return std::chrono::high_resolution_clock::now();
-}
 
 int main() {
+  omp_set_nested(1);
+  omp_set_num_threads(NUM_THREADS);
   // initialize encryption variables
   const int minimum_lambda = 128;
   TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(minimum_lambda);
@@ -28,9 +22,15 @@ int main() {
   num_type pt = 10;
 
   printf("%d\n", pt);
-  printf("sizeof %d\n", size);
+  printf("sizeof %ld\n", size);
 
   // encryption variable
+  int array_size = 10;
+  LweSample **arrays = new LweSample*[array_size];
+  for(int i = 0; i < array_size; i++) {
+    arrays[i] = new_gate_bootstrapping_ciphertext_array(size, params);
+    encrypt<num_type>(arrays[i], &pt, sk);
+  }
   LweSample *enc = new_gate_bootstrapping_ciphertext_array(size, params);
   encrypt<num_type>(enc, &pt, sk);
   // encryption variable 2
@@ -43,25 +43,23 @@ int main() {
   // twosComplement(sum, enc, ck, size);
   // rightRotate(sum, enc, ck, size, 3);
   // leftRotate(sum, enc, ck, size, 16);
-  // chrono_time start = get_time();
   // zero(enc, ck, size);
   // mult(sum, enc, b, ck, size);
+  int times = 5;
   double stt = omp_get_wtime();
-  int times = 1;
   for(int i = 0; i < times; i++)
+    reduce_add(sum, arrays, array_size, ck, size);
+    // seq_add(sum, arrays, array_size, ck, size);
     // invert(sum, enc, ck, size);
     // bootsOR(sum, enc, b, ck);
     // OR(sum, enc, b, ck, size);
     // mult(sum, enc, b, ck, size);
     // add(sum, enc, b, ck, size);
-    sub(sum, enc, b, ck, size);
+    // add(sum, enc, b, ck, size);
     // copy(sum, enc, ck, size);
-  // #pragma omp barrier
+/********/
   stt = (omp_get_wtime() - stt) / times;
   printf("time: %f seconds\n", stt);
-  // chrono_time end = get_time();
-  // cout << std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() / times << " microseconds" << endl;
-
 
   num_type recovered = decrypt<num_type>(enc, sk);
   printf("recovered: %d\n", recovered);

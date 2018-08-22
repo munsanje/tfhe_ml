@@ -2,8 +2,6 @@
 Implements higher level encryption functions to make using tfhe easier
 */
 
-#pragma once
-
 #include <cstddef>
 #include <tfhe/tfhe.h>
 #include <tfhe/tfhe_io.h>
