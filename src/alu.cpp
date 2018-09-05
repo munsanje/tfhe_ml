@@ -93,10 +93,6 @@ Python code: lr = lambda x, n, amnt: ((x << amnt) | (x >> (n-amnt)))&(2**n-1)
 void leftRotate(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size, int amnt) {
   leftShift(result, a, ck, size, amnt);
   copy(result, &a[size-amnt], ck, amnt);
-  // #pragma omp parallel for num_threads(NUM_THREADS)
-  // for(int i = 0; i < amnt; i++) {
-  //   bootsCOPY(&result[i], &a[size-amnt+i], ck);
-  // }
 }
 
 /*
@@ -107,10 +103,6 @@ Note the left most bit is set to 0
 void leftShift(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size, int amnt) {
   zero(&result[0], ck, size);
   copy(&result[amnt], a, ck, size-amnt);
-  // #pragma omp parallel for num_threads(NUM_THREADS)
-  // for(int i = 0; i < size-amnt; i++) {
-  //   bootsCOPY(&result[i+amnt], &a[i], ck);
-  // }
 }
 
 /**
@@ -119,10 +111,6 @@ Python code: rr = lambda x, n, amnt: ((x >> amnt) | (x << (n-amnt)))&(2**n-1)
 void rightRotate(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size, int amnt) {
   rightShift(result, a, ck, size, amnt);
   copy(&result[size-amnt], a, ck, amnt);
-  // #pragma omp parallel for num_threads(NUM_THREADS)
-  // for(int i = 0; i < amnt; i++) {
-  //   bootsCOPY(&result[size-amnt+i], &a[i], ck);
-  // }
 }
 
 /***/
@@ -215,72 +203,72 @@ void zero(LweSample* result, const TFheGateBootstrappingCloudKeySet* ck, const s
 }
 
 void OR(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsOR(&result[i], &a[i], &b[i], ck);
   }
 }
 
 void AND(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsAND(&result[i], &a[i], &b[i], ck);
   }
 }
 
 void NAND(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsNAND(&result[i], &a[i], &b[i], ck);
   }
 }
 
 void NOR(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsNOR(&result[i], &a[i], &b[i], ck);
   }
 }
 
 void XOR(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsXOR(&result[i], &a[i], &b[i], ck);
   }
 }
 
 void XNOR(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsXNOR(&result[i], &a[i], &b[i], ck);
   }
 }
 void ANDNY(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsANDNY(&result[i], &a[i], &b[i], ck);
   }
 }
 void ANDYN(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsANDYN(&result[i], &a[i], &b[i], ck);
   }
 }
 void ORNY(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsORNY(&result[i], &a[i], &b[i], ck);
   }
 }
 void ORYN(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsORYN(&result[i], &a[i], &b[i], ck);
   }
 }
 void MUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
-  #pragma omp parallel for num_threads(4)
+  #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsMUX(&result[i], &a[i], &b[i], &c[i], ck);
   }
