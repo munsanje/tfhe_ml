@@ -7,7 +7,7 @@
 
 using namespace std;
 
-vector<vector<int>> readFile(char* filepath) {
+vector<vector<int>> readFile(char* filepath, char delimiter) {
   string line;
   ifstream file(filepath);
   vector<vector<int>> read_to;
@@ -20,14 +20,14 @@ vector<vector<int>> readFile(char* filepath) {
   else {
     cout << "Error: failed to open file." << endl;
   }
-  read_to;
+  return read_to;
 }
 
-int writeFile(std::vector<vector<int>> write_from, char* filepath) {
+int writeFile(std::vector<vector<int>> write_from, char* filepath, char delimiter) {
   ofstream file(filepath);
   if(file.is_open()) {
     for(vector<vector<int>>::iterator it = write_from.begin(); it != write_from.end(); it++) {
-      file << rowToString(*it) << "\n";
+      file << rowToString(*it, delimiter) << "\n";
     }
     file.close();
   }
@@ -35,6 +35,7 @@ int writeFile(std::vector<vector<int>> write_from, char* filepath) {
     cout << "Error: failed to open file." << endl;
     return -1;
   }
+  return 0;
 
 }
 
@@ -45,7 +46,6 @@ vector<int> parseLine(string line, char delimiter) {
   do {
     next = line.find(delimiter);
     elem = line.substr(0, next);
-    cout << elem << endl;
     parsed.push_back(stoi(elem));
     line.erase(0, next + 1);
   } while(next != string::npos);
@@ -65,12 +65,15 @@ string rowToString(vector<int> row, char delimiter) {
 int main() {
   string line = "32,43,3,24,3";
   vector<int> parsed = parseLine(line);
-  for(int i: parsed)
-    cout << " " << i;
-  cout << endl;
-  cout << rowToString(parsed) << endl;
-  vector<vector<int>> vec;
-  vec.push_back(parsed);
-  vec.push_back(parsed);
-  cout << writeFile(vec, "testcsv.csv") << endl;
+  // for(int i: parsed)
+  //   cout << " " << i;
+  // cout << endl;
+  // cout << rowToString(parsed) << endl;
+  vector<vector<int>> vec = readFile("testcsv.csv");
+  for(vector<vector<int>>::iterator it = vec.begin(); it != vec.end(); it++) {
+    cout << rowToString(*it) << endl;
+  }
+  // vec.push_back(parsed);
+  // vec.push_back(parsed);
+  // cout << writeFile(vec, "testcsv.csv") << endl;
 }
