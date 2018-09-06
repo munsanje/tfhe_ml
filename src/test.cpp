@@ -43,8 +43,8 @@ int main() {
       sum[i][j] = new_gate_bootstrapping_ciphertext_array(size, params);
     }
   }
-  mat_add(sum, arrays, arrays, array_size, array_size, ck, size);
-  cout << "added" << endl;
+  elem_mult(sum, arrays, arrays, array_size, array_size, ck, size);
+  cout << "done" << endl;
   // LweSample *enc = new_gate_bootstrapping_ciphertext_array(size, params);
   // encrypt<num_type>(enc, &pt, sk);
   // // encryption variable 2
