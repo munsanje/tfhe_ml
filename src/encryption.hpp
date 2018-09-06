@@ -5,16 +5,26 @@ Implements higher level encryption functions to make using tfhe easier
 #include <cstddef>
 #include <tfhe/tfhe.h>
 #include <tfhe/tfhe_io.h>
-
+#include <vector>
 
 /*Encrypt plaintext sample given secret key*/
 template<typename T>
-void encrypt(LweSample* cipher, T* plaintext, const TFheGateBootstrappingSecretKeySet* sk) {
+
+void encrypt(LweSample* cipher, T& plaintext, const TFheGateBootstrappingSecretKeySet* sk) {
   uint8_t type_size = sizeof(T) * 8;
   for(int i = 0; i < type_size; i++) {
-    bootsSymEncrypt(&cipher[i], (*plaintext >> i) & 1, sk);
+    bootsSymEncrypt(&cipher[i], (plaintext >> i) & 1, sk);
   }
 }
+
+// template<typename T>
+// void encrypt(vector<LweSample*> cipher, vector<T>& plaintext, const TFheGateBootstrappingSecretKeySet* sk) {
+//   uint8_t type_size = sizeof(T) * 8;
+//   for(int i = 0; i < type_size; i++) {
+//     bootsSymEncrypt(&cipher[i], (*plaintext >> i) & 1, sk);
+//   }
+// }
+
 
 
 /*Decrypt cipher given secret key*/

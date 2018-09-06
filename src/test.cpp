@@ -32,7 +32,7 @@ int main() {
     arrays[i] = new LweSample*[array_size];
     for(int j = 0; j < array_size; j++) {
       arrays[i][j] = new_gate_bootstrapping_ciphertext_array(size, params);
-      encrypt<num_type>(arrays[i][j], &pt, sk);
+      encrypt<num_type>(arrays[i][j], pt, sk);
     }
   }
 
@@ -43,8 +43,8 @@ int main() {
       sum[i][j] = new_gate_bootstrapping_ciphertext_array(size, params);
     }
   }
-  elem_mult(sum, arrays, arrays, array_size, array_size, ck, size);
-  cout << "done" << endl;
+  mat_add(sum, arrays, arrays, array_size, array_size, ck, size);
+  cout << "added" << endl;
   // LweSample *enc = new_gate_bootstrapping_ciphertext_array(size, params);
   // encrypt<num_type>(enc, &pt, sk);
   // // encryption variable 2

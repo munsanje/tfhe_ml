@@ -7,10 +7,10 @@
 
 using namespace std;
 
-vector<vector<int>> readFile(char* filepath, char delimiter) {
+vector<vector<double>> readFile(char* filepath, char delimiter) {
   string line;
   ifstream file(filepath);
-  vector<vector<int>> read_to;
+  vector<vector<double>> read_to;
   if(file.is_open()) {
     while(getline(file, line)) {
       read_to.push_back(parseLine(line));
@@ -23,10 +23,10 @@ vector<vector<int>> readFile(char* filepath, char delimiter) {
   return read_to;
 }
 
-int writeFile(std::vector<vector<int>> write_from, char* filepath, char delimiter) {
+int writeFile(std::vector<vector<double>> write_from, char* filepath, char delimiter) {
   ofstream file(filepath);
   if(file.is_open()) {
-    for(vector<vector<int>>::iterator it = write_from.begin(); it != write_from.end(); it++) {
+    for(vector<vector<double>>::iterator it = write_from.begin(); it != write_from.end(); it++) {
       file << rowToString(*it, delimiter) << "\n";
     }
     file.close();
@@ -39,22 +39,22 @@ int writeFile(std::vector<vector<int>> write_from, char* filepath, char delimite
 
 }
 
-vector<int> parseLine(string line, char delimiter) {
+vector<double> parseLine(string line, char delimiter) {
   size_t next = 0;
   string elem;
-  vector<int> parsed;
+  vector<double> parsed;
   do {
     next = line.find(delimiter);
     elem = line.substr(0, next);
-    parsed.push_back(stoi(elem));
+    parsed.push_back(stod(elem));
     line.erase(0, next + 1);
   } while(next != string::npos);
   return parsed;
 }
 
-string rowToString(vector<int> row, char delimiter) {
+string rowToString(vector<double> row, char delimiter) {
   string line = "";
-  for(int i: row) {
+  for(double i: row) {
     line += to_string(i) + delimiter;
   }
   line.erase(line.length()-1);
@@ -63,14 +63,15 @@ string rowToString(vector<int> row, char delimiter) {
 }
 
 int main() {
-  string line = "32,43,3,24,3";
-  vector<int> parsed = parseLine(line);
-  // for(int i: parsed)
-  //   cout << " " << i;
-  // cout << endl;
+  string line = "32.43342,43.90943,3,24,3";
+  vector<double> parsed = parseLine(line);
+  for(double i: parsed)
+    cout << " " << i;
+  cout << endl;
+  return 0;
   // cout << rowToString(parsed) << endl;
-  vector<vector<int>> vec = readFile("testcsv.csv");
-  for(vector<vector<int>>::iterator it = vec.begin(); it != vec.end(); it++) {
+  vector<vector<double>> vec = readFile("testcsv.csv");
+  for(vector<vector<double>>::iterator it = vec.begin(); it != vec.end(); it++) {
     cout << rowToString(*it) << endl;
   }
   // vec.push_back(parsed);
