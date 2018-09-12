@@ -7,11 +7,17 @@ all: test
 run: test
 	./test
 
-test: test.o encryption.o alu.o matrix.o
-	$(CC) $(CCFLAGS) -o test test.o alu.o matrix.o $(LDFLAGS)
+test: test.o encryption.o alu.o matrix.o logistic.o io.o
+	$(CC) $(CCFLAGS) -o test test.o alu.o matrix.o logistic.o io.o $(LDFLAGS)
 
-test.o: test.cpp encryption.hpp alu.o matrix.o
-	$(CC) $(CCFLAGS) -c test.cpp encryption.hpp alu.cpp matrix.cpp $(LDFLAGS)
+test.o: test.cpp encryption.hpp alu.o matrix.o logistic.o io.o
+	$(CC) $(CCFLAGS) -c test.cpp encryption.hpp alu.cpp matrix.cpp logistic.cpp io.cpp $(LDFLAGS)
+
+logistic.o: logistic.cpp numeric.hpp io.hpp encryption.hpp
+	$(CC) $(CCFLAGS) -c logistic.cpp numeric.hpp io.cpp encryption.hpp $(LDFLAGS)
+
+io.o: io.cpp
+	$(CC) $(CCFLAGS) -c io.cpp $(LDFLAGS)
 
 matrix.o: matrix.cpp matrix.hpp alu.o
 	$(CC) $(CCFLAGS) -c matrix.cpp alu.cpp $(LDFLAGS)

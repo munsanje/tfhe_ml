@@ -20,6 +20,7 @@ TODO: replace raw pointers with smart
 #include <tfhe/tfhe.h>
 #include <tfhe/tfhe_io.h>
 #include <cstddef>
+#include <vector>
 
 
 class ApproxLogRegression {
@@ -30,36 +31,36 @@ class ApproxLogRegression {
     char* coefs_path;  // path to polynomial coefficients
     LweSample **weights;  // regression weights
     int dim;  // input data dimension
-    uint16_t coefs[];  // polynomial parameters
+    LweSample **coefs;  // TODO optimize by accounting for null coefficients
     uint8_t degree;  // polynomial degree
     /* HE-related members */
-    TFheGateBootstrappingCloudKeySet* ck;  // cloud key set
+    const TFheGateBootstrappingCloudKeySet* ck;  // cloud key set
     size_t size;  // number of bits of precision
     bool mode_clip;  // If true, use range [-2^(n-1), 2^(n-1)-1] and clip to range, else use [-2^(n-2), 2^(n-2)-1] instead
 
   public:
 
-    ApproxLogRegression(char weight_path, char* coefs_path, int dim, TFheGateBootstrappingCloudKeySet* ck, size_t size);
+    ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, bool mode_clip=true);
 
     /**
       Run inference on given sample X
     */
-    void predict(LweSample* y, const LweSample** X);
+    void predict(LweSample* y, LweSample** X);
 
     /**
       Compute polynomail approximation to sigmoid
     */
-    void approx_sigmoid(LweSample* output, const LweSample* X);
+    void approxSigmoid(LweSample* y, LweSample* X);
 
     /**
       Compute single forward pass of logistic regression
     */
-    void forward(LweSample* output, const LweSample** X);
+    void forward(LweSample* y, LweSample** X);
 
     /**
       Compute preactivation of forward pass
     */
-    void preactivation(LweSample* output, const LweSample** weights);
+    void preactivation(LweSample* y, LweSample** X);
 
 
 };

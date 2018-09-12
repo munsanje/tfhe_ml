@@ -61,7 +61,7 @@ string rowToString(vector<double> row, char delimiter) {
   return line;
 
 }
-
+/*
 int main() {
   string line = "32.43342,43.90943,3,24,3";
   vector<double> parsed = parseLine(line);
@@ -78,3 +78,4 @@ int main() {
   // vec.push_back(parsed);
   // cout << writeFile(vec, "testcsv.csv") << endl;
 }
+*/

@@ -166,6 +166,21 @@ void mult(LweSample* result, const LweSample* a, const LweSample* b, const TFheG
   delete[] p;
 }
 
+// NOTE assumes n >= 0
+void power(LweSample* result, const LweSample* a, int n, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
+  if(n == 0) {
+    zero(result, ck, size);
+    bootsCONSTANT(&result[0], 1, ck);
+  }
+  else if(n == 1) {
+    copy(result, a, ck, size);
+  }
+
+  for(int i = 0; i < n; i++) {
+    mult(result, a, a, ck, size);
+  }
+}
+
 /* Implements two's complement*/
 void twosComplement(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
   LweSample *one = new_gate_bootstrapping_ciphertext_array(size, ck->params),
@@ -271,5 +286,12 @@ void MUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSam
   #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < size; i++) {
     bootsMUX(&result[i], &a[i], &b[i], &c[i], ck);
+  }
+}
+
+void CONSTANT(LweSample* result, const int& a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size) {
+  #pragma omp parallel for num_threads(NUM_THREADS)
+  for(int i = 0; i < size; i++) {
+    bootsCONSTANT(&result[i], (a >> i) & 1, ck);
   }
 }

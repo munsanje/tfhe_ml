@@ -18,5 +18,5 @@ void elem_mult(LweSample*** sum, LweSample*** a, LweSample** b, const int rows, 
 void elem_mult(LweSample*** prod, LweSample** a, LweSample*** b, const int rows, const int cols, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void elem_mult(LweSample*** prod, LweSample** a, LweSample** b, const int cols, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void mat_mult(LweSample*** prod, LweSample*** a, LweSample*** b, const int rows, const int cols, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
-void dot(LweSample** prod, LweSample** a, LweSample** b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
+void dot(LweSample* prod, LweSample** a, LweSample** b, const int cols, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void transpose(LweSample*** transpose, const LweSample*** source, const TFheGateBootstrappingCloudKeySet* ck, size_t size);

@@ -20,6 +20,7 @@ void rightRotate(LweSample* result, const LweSample* a, const TFheGateBootstrapp
 void rightShift(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size, int amnt);
 void sub(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void mult(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
+void power(LweSample* result, const LweSample* a, int n, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void twosComplement(LweSample* result, const LweSample* a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void copy(LweSample* dest, const LweSample* source, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void zero(LweSample* result, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
@@ -35,6 +36,8 @@ void ANDYN(LweSample* result, const LweSample* a, const LweSample* b, const TFhe
 void ORNY(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void ORYN(LweSample* result, const LweSample* a, const LweSample* b, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 void MUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
+void CONSTANT(LweSample* result, const int& a, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
+
 void reduce_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
 
 void seq_add(LweSample* result, LweSample** arrays, int num_arrays, const TFheGateBootstrappingCloudKeySet* ck, const size_t size);
