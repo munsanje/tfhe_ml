@@ -23,7 +23,7 @@ void encrypt(LweSample* cipher, T plaintext, const TFheGateBootstrappingSecretKe
 template<typename T>
 void encrypt(LweSample** cipher, vector<T>& plaintext, const TFheGateBootstrappingSecretKeySet* sk) {
   uint8_t type_size = sizeof(T) * 8;
-  #pragma omp parallel for num_threads(NUM_THREADS)
+  // #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < plaintext.length(); i++) {
     encrypt(cipher[i], plaintext[i], sk);
   }
@@ -44,7 +44,7 @@ template<typename T>
 vector<T> decrypt(LweSample** cipher, int length, const TFheGateBootstrappingSecretKeySet* sk) {
   uint8_t type_size = sizeof(T) * 8;
   vector<T> plaintext(length, 0);
-  #pragma omp parallel for num_threads(NUM_THREADS)
+  // #pragma omp parallel for num_threads(NUM_THREADS)
   for(int i = 0; i < length; i++) {
     for(int j = 0; j < type_size; j++) {
       plaintext[i] |= bootsSymDecrypt(&cipher[i][j], sk) << j;

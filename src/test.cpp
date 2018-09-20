@@ -20,7 +20,7 @@ int main() {
   const TFheGateBootstrappingCloudKeySet* ck = &sk->cloud;
 
   // initialize test parameters
-  typedef int16_t num_type;
+  typedef int8_t num_type;
   size_t size = sizeof(num_type) * 8;
   num_type pt = 1;
   num_type pt2 = -25;
@@ -28,14 +28,14 @@ int main() {
   printf("sizeof %ld\n", size);
 
   /*logistic regression stuff*/
-  char *coefs_path = "/home/munsanje/Uni/Thesis/code/wiscons_state/polycoefs.csv",
-       *weights_path = "/home/munsanje/Uni/Thesis/code/wiscons_state/logweights_wiscon_real_0.01.csv",
-       *data_path = "/home/munsanje/Uni/Thesis/data/cleaned_scaled_int16_breast-cancer-wisconsin.data";
+  char *coefs_path = "/home/munsanje/Uni/Thesis/code/linear_logapprox_coefs_neg1to1.csv",
+       *weights_path = "/home/munsanje/Uni/Thesis/code/sign_weights_wiscon_real_linapprox_weights.csv",
+       *data_path = "/home/munsanje/Uni/Thesis/data/testset_int8_breast-cancer-wisconsin.data";
   int dim = 9;
-
-  ApproxLogRegression lr(weights_path, coefs_path, dim, ck, size);
+  int precision = 10;
+  ApproxLogRegression lr(weights_path, coefs_path, dim, ck, size, precision);
   vector<vector<double>> data = readFile(data_path);
-  int which = 4;
+  int which = 3;
   for(int i = 0; i < dim; i++)
     cout << data[which][i] << " ";
   cout << endl;
@@ -50,17 +50,19 @@ int main() {
       encrypt<num_type>(enc_data[i][j], data[i][j], sk);
     }
   }
+
   LweSample *y = new_gate_bootstrapping_ciphertext_array(size, params);
-
-  cout << "running pred" << endl;
-  lr.predict(y, enc_data[which]);
-  cout << "finished pred" << endl;
-
-  // LweSample* a = new_gate_bootstrapping_ciphertext_array(size, params);
-  // encrypt<num_type>(a, pt, sk);
-  // lr.approxSigmoid(y, a);
-  num_type res = decrypt<num_type>(y, sk) >= 0.5 ? 1 : 0;
-  cout << res << endl;
+  for(int i = 0; i < N; i++) {
+    printf("Job [%d/%d]\n", i+1, N);
+    lr.predict(y, enc_data[i]);
+    int res = decrypt<num_type>(y, sk);
+    double proba = ((float) res ) / 100;
+    cout << "Raw: " << res << endl;
+    cout << "Probability: " << proba << endl;
+    int cls = proba >= 0.5 ? 1 : 0;
+    printf("Predicted class: %d\n", (int) cls);
+    printf("Ground truth: %d\n", (int) data[i][d]);
+  }
 // */
   /**************************/
 /* arithmetic stuff

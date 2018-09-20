@@ -9,10 +9,10 @@
 using namespace std;
 
 
-ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, bool mode_clip)
-  : weight_path(weight_path), coefs_path(coefs_path), dim(dim), ck(ck), size(size), mode_clip(mode_clip) {
+ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, size_t precision, bool mode_clip)
+  : weight_path(weight_path), coefs_path(coefs_path), dim(dim), ck(ck), size(size), precision(precision), mode_clip(mode_clip) {
   // load weights from text file and convert to fixed precision integer
-  vector<int> plaintext_weights = float_to_fixed<int>(readFile(weight_path)[0], size, mode_clip);  // FIXME opaque code
+  vector<int> plaintext_weights = float_to_fixed<int>(readFile(weight_path)[0], size, 1, mode_clip);  // FIXME opaque code
   // FIXME make more standardised weight initialization subroutine
   weights = new LweSample*[dim];
   cout << "Converting weights:";
@@ -24,7 +24,9 @@ ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, in
   }
   cout << endl;
   // load polynomial coefficients
-  vector<int16_t> plaintext_coefs = float_to_fixed<int16_t>(readFile(coefs_path)[0], size, mode_clip);
+  vector<int16_t> plaintext_coefs = float_to_fixed<int16_t>(readFile(coefs_path)[0], size, precision, mode_clip);
+  // FIXME make more general. Multiplying by 10 here so that original function can be recovered
+  plaintext_coefs[0] *= 10;
   degree = plaintext_coefs.size() - 1;
   coefs = new LweSample*[degree + 1];
   cout << "Converting coefficients:";
@@ -63,11 +65,16 @@ void ApproxLogRegression::approxSigmoid(LweSample* y, LweSample* X) {
     mult(temp, y, X, ck, size);
     add(y, coefs[i], temp, ck, size);
   }
+  delete_gate_bootstrapping_ciphertext_array(size, temp);
 }
 
 void ApproxLogRegression::forward(LweSample* y, LweSample** X) {
   preactivation(y, X);
-  approxSigmoid(y, y);
+  LweSample *temp = new_gate_bootstrapping_ciphertext_array(size, ck->params);
+  copy(temp, y, ck, size);
+  approxSigmoid(y, temp);
+  delete_gate_bootstrapping_ciphertext_array(size, temp);
+
 }
 
 /**

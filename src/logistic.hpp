@@ -36,11 +36,12 @@ class ApproxLogRegression {
     /* HE-related members */
     const TFheGateBootstrappingCloudKeySet* ck;  // cloud key set
     size_t size;  // number of bits of precision
+    size_t precision;  // factor for fixed-float conversions
     bool mode_clip;  // If true, use range [-2^(n-1), 2^(n-1)-1] and clip to range, else use [-2^(n-2), 2^(n-2)-1] instead
 
   public:
 
-    ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, bool mode_clip=true);
+    ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, size_t precision, bool mode_clip=true);
 
     /**
       Run inference on given sample X
