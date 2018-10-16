@@ -7,7 +7,7 @@
 
 using namespace std;
 
-vector<vector<double>> readFile(char* filepath, char delimiter) {
+vector<vector<double>> readFile(string filepath, char delimiter) {
   string line;
   ifstream file(filepath);
   vector<vector<double>> read_to;
@@ -23,9 +23,11 @@ vector<vector<double>> readFile(char* filepath, char delimiter) {
   return read_to;
 }
 
-int writeFile(std::vector<vector<double>> write_from, char* filepath, char delimiter) {
+int writeFile(vector<vector<double>> write_from, string filepath, char delimiter, string header) {
   ofstream file(filepath);
   if(file.is_open()) {
+    if(header != "")
+      file << header << "\n";
     for(vector<vector<double>>::iterator it = write_from.begin(); it != write_from.end(); it++) {
       file << rowToString(*it, delimiter) << "\n";
     }
@@ -37,6 +39,21 @@ int writeFile(std::vector<vector<double>> write_from, char* filepath, char delim
   }
   return 0;
 
+}
+
+int writeFile(vector<double> write_from, string filepath, char delimiter, string header) {
+  ofstream file(filepath);
+  if(file.is_open()) {
+    if(header != "")
+      file << header << "\n";
+    file << rowToString(write_from, delimiter) << "\n";
+    file.close();
+  }
+  else {
+    cout << "Error: failed to open file." << endl;
+    return -1;
+  }
+  return 0;
 }
 
 vector<double> parseLine(string line, char delimiter) {

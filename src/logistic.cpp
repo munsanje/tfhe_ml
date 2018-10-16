@@ -9,8 +9,8 @@
 using namespace std;
 
 
-ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, size_t precision, bool mode_clip)
-  : weight_path(weight_path), coefs_path(coefs_path), dim(dim), ck(ck), size(size), precision(precision), mode_clip(mode_clip) {
+ApproxLogRegression::ApproxLogRegression(string weight_path, string coefs_path, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, size_t scale_factor, bool mode_clip)
+  : weight_path(weight_path), coefs_path(coefs_path), dim(dim), ck(ck), size(size), scale_factor(scale_factor), mode_clip(mode_clip) {
   // load weights from text file and convert to fixed precision integer
   vector<int> plaintext_weights = float_to_fixed<int>(readFile(weight_path)[0], size, 1, mode_clip);  // FIXME opaque code
   // FIXME make more standardised weight initialization subroutine
@@ -24,9 +24,9 @@ ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, in
   }
   cout << endl;
   // load polynomial coefficients
-  vector<int16_t> plaintext_coefs = float_to_fixed<int16_t>(readFile(coefs_path)[0], size, precision, mode_clip);
+  vector<int16_t> plaintext_coefs = float_to_fixed<int16_t>(readFile(coefs_path)[0], size, scale_factor, mode_clip);
   // FIXME make more general. Multiplying by 10 here so that original function can be recovered
-  plaintext_coefs[0] *= 10;
+  plaintext_coefs[0] *= scale_factor;
   degree = plaintext_coefs.size() - 1;
   coefs = new LweSample*[degree + 1];
   cout << "Converting coefficients:";
@@ -39,6 +39,38 @@ ApproxLogRegression::ApproxLogRegression(char* weight_path, char* coefs_path, in
 
 
 }
+
+ApproxLogRegression::ApproxLogRegression(vector<double> weights_in, vector<double> coefs_in, int dim, const TFheGateBootstrappingCloudKeySet* ck, size_t size, size_t scale_factor, bool mode_clip)
+  : dim(dim), ck(ck), size(size), scale_factor(scale_factor), mode_clip(mode_clip) {
+  // load weights from text file and convert to fixed precision integer
+  vector<int> plaintext_weights = float_to_fixed<int>(weights_in, size, 1, mode_clip);
+  // FIXME make more standardised weight initialization subroutine
+  weights = new LweSample*[dim];
+  cout << "Converting weights:";
+  for(int i = 0; i < dim; i++) {
+    weights[i] = new_gate_bootstrapping_ciphertext_array(size, ck->params);
+    // convert to constant function
+    CONSTANT(weights[i], plaintext_weights[i], ck, size);
+    cout << " " << plaintext_weights[i];
+  }
+  cout << endl;
+  // load polynomial coefficients
+  vector<int16_t> plaintext_coefs = float_to_fixed<int16_t>(coefs_in, size, scale_factor, mode_clip);
+
+  // FIXME make more general. Multiplying by 10 here so that original function can be recovered
+  plaintext_coefs[0] *= scale_factor;
+  degree = plaintext_coefs.size() - 1;
+  coefs = new LweSample*[degree + 1];
+  cout << "Converting coefficients:";
+  for(int i = 0; i < degree + 1; i++) {
+    coefs[i] = new_gate_bootstrapping_ciphertext_array(size, ck->params);
+    CONSTANT(coefs[i], plaintext_coefs[i], ck, size);
+    cout << " " << plaintext_coefs[i];
+  }
+  cout << endl;
+
+}
+
 
 // TODO implement destructor
 
