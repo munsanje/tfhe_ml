@@ -34,14 +34,6 @@ string toTimestamped(string name) {
   return name + "_" + to_string(time(0));
 }
 
-
-void testPolynomial() {
-
-
-}
-
-void testForward() {}
-
 /* Runs model on data and measures precision, recall, accuracy and saves to csv */
 template<typename T>
 void gradeModel(string weight_path, string coefs_path, string data_path, int dim, size_t precision, const TFheGateBootstrappingSecretKeySet* sk) {
