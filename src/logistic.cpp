@@ -50,7 +50,7 @@ void ApproxLogRegression::predict(LweSample* y, LweSample** X) {
 }
 
 /**
-  Implements Honier's algorithm:
+  Implements Horner's algorithm:
   b_k = a_k + b_{k+1}*x for k in {0, 1, ... n-1}
   b_n = a_n
   The result is then b_0 = a_0 + b_1 * x
