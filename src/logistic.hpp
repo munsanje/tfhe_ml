@@ -49,7 +49,7 @@ class ApproxLogRegression {
     void predict(LweSample* y, LweSample** X);
 
     /**
-      Compute polynomail approximation to sigmoid
+      Compute polynomial approximation to sigmoid
     */
     void approxSigmoid(LweSample* y, LweSample* X);
 
