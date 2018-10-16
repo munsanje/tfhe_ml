@@ -65,8 +65,8 @@ void gradeModel(string weight_path, string coefs_path, string data_path, int dim
 
   double tick,
          agg = 0;
-  int num_iters = 5; // N;
-  for(int i = 0; i < 5; i++) {
+  int num_iters = N;
+  for(int i = 0; i < num_iters; i++) {
     printf("Job [%d/%d]\n", i+1, N);
     tick = omp_get_wtime();
     lr.predict(y, enc_data[i]);

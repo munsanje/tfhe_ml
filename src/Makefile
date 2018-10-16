@@ -14,6 +14,12 @@ test: test.o encryption.o alu.o matrix.o logistic.o io.o
 test.o: test.cpp encryption.hpp alu.o matrix.o logistic.o io.o
 	$(CC) $(CCFLAGS) -c test.cpp encryption.hpp alu.cpp matrix.cpp logistic.cpp io.cpp $(LDFLAGS)
 
+test_arithmetic: test_arithmetic.o encryption.o alu.o matrix.o logistic.o io.o metrics.o
+	$(CC) $(CCFLAGS) -o test_arithmetic test_arithmetic.o alu.o matrix.o logistic.o io.o metrics.o $(LDFLAGS)
+
+test_arithmetic.o: test_arithmetic.cpp encryption.hpp alu.o matrix.o logistic.o io.o metrics.o tfhe_params.hpp
+	$(CC) $(CCFLAGS) -c test_arithmetic.cpp encryption.hpp alu.cpp matrix.cpp logistic.cpp io.cpp metrics.cpp tfhe_params.hpp $(LDFLAGS)
+
 test_logistic: test_logistic.o encryption.o alu.o matrix.o logistic.o io.o metrics.o
 	$(CC) $(CCFLAGS) -o test_logistic test_logistic.o alu.o matrix.o logistic.o io.o metrics.o $(LDFLAGS)
 
