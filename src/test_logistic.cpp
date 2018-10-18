@@ -113,14 +113,14 @@ int main() {
     string weight_path = "/home/munsanje/Uni/Thesis/code/sign_weights_wiscon_real_linapprox_weights.csv",
            coefs_path = "/home/munsanje/Uni/Thesis/code/linear_logapprox_coefs_neg1to1.csv",
            data_path = "/home/munsanje/Uni/Thesis/data/testset_int8_breast-cancer-wisconsin.data";
-    int dim = 9, precision = 10;
+    int dim = 9, scale_factor = 10;
     typedef int8_t num_type;
     size_t size = sizeof(num_type) * 8;
 
     TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(MINIMUM_LAMBDA);
     const TFheGateBootstrappingSecretKeySet* sk = new_random_gate_bootstrapping_secret_keyset(params);
 
-    gradeModel<num_type>(weight_path, coefs_path, data_path, dim, precision, sk);
+    gradeModel<num_type>(weight_path, coefs_path, data_path, dim, scale_factor, sk);
 
 
 }
