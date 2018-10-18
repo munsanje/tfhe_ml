@@ -33,11 +33,6 @@ string toTimestamped(string name) {
   return name + "_" + to_string(time(0));
 }
 
-
-void test_parallelism() {
-
-}
-
 /* Tests basic execution times of all arithmetic functions */
 template<typename T>
 vector<double> test_execution_times() {
