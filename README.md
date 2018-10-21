@@ -18,13 +18,13 @@ This code depends on the TFHE library.
 1. Clone the TFHE repo to the directory $TFHE_DIR (assuming that's where you've stored the location) and run the following commands:
 
 
-    cd $TFHE_DIR
-    git submodule init
-    git submodule update
-    mkdir build
-    cd build
-    cmake .. ${BUILD_FLAGS:-'-DENABLE_FFTW=on -DCMAKE_BUILD_TYPE=optim -DENABLE_TESTS=off'}
-    make
+        cd $TFHE_DIR
+        git submodule init
+        git submodule update
+        mkdir build
+        cd build
+        cmake .. ${BUILD_FLAGS:-'-DENABLE_FFTW=on -DCMAKE_BUILD_TYPE=optim -DENABLE_TESTS=off'}
+        make
 
 
 The library is now built. See tfhe_ml/src/Makefile to see how to compile the program.
