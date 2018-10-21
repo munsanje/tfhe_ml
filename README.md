@@ -68,6 +68,16 @@ The library is now built. See tfhe_ml/src/Makefile to see how to compile the pro
 
         std::cout << pt << " + " << pt2 << " = " << plain_sum << std::endl;
 
+## Built-in tests
+
+Two test programs have been written:
+
+1. `src/test_arithmetic.cpp` - This tests the timing characteristics of the arithmetic library. To build, run `make test_arithmetic` from within `src` directory and then run `./test_arithmetic` to run.
+
+2. `src/test_logistic.cpp` - This tests the logistic regression algorithm. To build, run `make test_logistic` from within `src` directory and then run `./test_logistic` to run.
+
+
+
 
 # References
 1. TFHE: https://github.com/tfhe/tfhe
