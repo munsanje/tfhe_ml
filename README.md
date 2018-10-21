@@ -11,9 +11,17 @@ This repo relies on the TFHE homomorphic encryption library linked at the bottom
 
 ## Package dependencies
 
+Languages: C++, Python
+
 NOTE: This code has only been tested on an Ubuntu 16.04 machine.
 
+### C++
 This code depends on the TFHE library.
+
+### Python
+See `src/python/requirements.txt`
+From within `src/python`, run `pip install -r requirements.txt` to install python dependencies.
+
 
 ### Installing TFHE library
 
