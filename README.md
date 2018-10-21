@@ -37,9 +37,9 @@ The library is now built. See tfhe_ml/src/Makefile to see how to compile the pro
     #include "encryption.hpp"
     #include "alu.hpp"
     #include <iostream>
-    
+
     int main() {
-    
+
         typdedef num_type int8_t;
         size_t size = sizeof(num_type) * 8;
         // setup
@@ -47,28 +47,27 @@ The library is now built. See tfhe_ml/src/Makefile to see how to compile the pro
         TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(minimum_lambda);
         const TFheGateBootstrappingSecretKeySet* sk = new_random_gate_bootstrapping_secret_keyset(params);
         const TFheGateBootstrappingCloudKeySet* ck = &sk->cloud;
-        
+
         LweSample *enc_a = new_gate_bootstrapping_ciphertext_array(size, params),
                   *enc_b = new_gate_bootstrapping_ciphertext_array(size, params);
-        
+
         // define integer
         num_type pt = 8, pt2 = 45;
         encrypt<num_type>(enc_a, pt, sk);
         encrypt<num_type>(enc_b, pt2, sk);
-        
+
         // create new encrypted object to hold sum
         LweSample *sum = new_gate_bootstrapping_ciphertext_array(size, params);
-        
-        
+
+
         // add the two integers homomorphically
         add(sum, enc_a, enc_b, ck, size);
-        
+
         // decrypt and print out
         num_type plain_sum= decrypt<num_type>(sum, sk);
-        
+
         std::cout << pt << " + " << pt2 << " = " << plain_sum << std::endl;
 
 
 # References
 1. TFHE: https://github.com/tfhe/tfhe
-
