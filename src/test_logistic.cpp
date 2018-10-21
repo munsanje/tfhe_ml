@@ -110,9 +110,9 @@ int main() {
     omp_set_nested(1);
     omp_set_num_threads(NUM_THREADS);
 
-    string weight_path = "/home/munsanje/Uni/Thesis/code/sign_weights_wiscon_real_linapprox_weights.csv",
-           coefs_path = "/home/munsanje/Uni/Thesis/code/linear_logapprox_coefs_neg1to1.csv",
-           data_path = "/home/munsanje/Uni/Thesis/data/testset_int8_breast-cancer-wisconsin.data";
+    string weight_path = "../data/sign_weights_wiscon_real_linapprox_weights.csv",
+           coefs_path = "../data/linear_logapprox_coefs_neg1to1.csv",
+           data_path = "../data/testset_int8_breast-cancer-wisconsin.data";
     int dim = 9, scale_factor = 10;
     typedef int8_t num_type;
     size_t size = sizeof(num_type) * 8;
