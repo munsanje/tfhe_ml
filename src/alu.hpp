@@ -1,8 +1,6 @@
 /**
-    * Implements addition, subtraction, and multiplication operations
+    * Implements addition, subtraction, and multiplication operations, as well as logical operations
 
-    * Design philosophy is to rely on as few helper classes/constructs as possible. This means the functions
-        accept ordinary C++ types (regular ints) and executes on them
 */
 
 #pragma once

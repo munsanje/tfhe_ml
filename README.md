@@ -11,6 +11,8 @@ This repo relies on the TFHE homomorphic encryption library linked at the bottom
 
 ## Package dependencies
 
+NOTE: This code has only been tested on an Ubuntu 16.04 machine.
+
 This code depends on the TFHE library.
 
 ### Installing TFHE library
