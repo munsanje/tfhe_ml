@@ -15,7 +15,7 @@ This code depends on the TFHE library.
 
 ### Installing TFHE library
 
-1. Clone the TFHE repo to the directory $TFHE_DIR (assuming that's where you've stored the location) and run the following commands:
+1. Clone the TFHE repo to the directory `$TFHE_DIR` (assuming that's where you've stored the location) and run the following commands:
 
 
         cd $TFHE_DIR
