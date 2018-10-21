@@ -64,9 +64,11 @@ The library is now built. See tfhe_ml/src/Makefile to see how to compile the pro
         add(sum, enc_a, enc_b, ck, size);
 
         // decrypt and print out
-        num_type plain_sum= decrypt<num_type>(sum, sk);
+        num_type plain_sum = decrypt<num_type>(sum, sk);
 
         std::cout << pt << " + " << pt2 << " = " << plain_sum << std::endl;
+
+    }
 
 ## Built-in tests
 
